@@ -3,14 +3,14 @@ import { combineResolvers } from 'graphql-resolvers';
 import pubsub, { EVENTS } from '../subscription';
 import { isAuthenticated, isMessageOwner } from './authorization';
 
-const toCursorHash = string => Buffer.from(string).toString('base64');
+const toCursorHash = (string: ArrayBuffer | SharedArrayBuffer) => Buffer.from(string).toString('base64');
 
-const fromCursorHash = string =>
+const fromCursorHash = (string: string) =>
   Buffer.from(string, 'base64').toString('ascii');
 
 export default {
   Query: {
-    messages: async (parent, { cursor, limit = 100 }, { models }) => {
+    messages: async (parent: any, { cursor, limit = 100 }: any, { models }: any) => {
       const cursorOptions = cursor
         ? {
             createdAt: {
@@ -40,7 +40,7 @@ export default {
         },
       };
     },
-    message: async (parent, { id }, { models }) => {
+    message: async (parent: any, { id }: any, { models }: any) => {
       return await models.Message.findById(id);
     },
   },
@@ -48,7 +48,7 @@ export default {
   Mutation: {
     createMessage: combineResolvers(
       isAuthenticated,
-      async (parent, { text }, { models, me }) => {
+      async (parent, { text }, { models, me }: any) => {
         const message = await models.Message.create({
           text,
           userId: me.id,
@@ -79,7 +79,7 @@ export default {
   },
 
   Message: {
-    user: async (message, args, { loaders }) => {
+    user: async (message: { userId: any; }, args: any, { loaders }: any) => {
       return await loaders.user.load(message.userId);
     },
   },

@@ -1,7 +1,7 @@
 import { ForbiddenError } from 'apollo-server';
 import { combineResolvers, skip } from 'graphql-resolvers';
 
-export const isAuthenticated = (parent, args, { me }) =>
+export const isAuthenticated = (parent: any, args: any, { me }: any) =>
   me ? skip : new ForbiddenError('Not authenticated as user.');
 
 export const isAdmin = combineResolvers(
@@ -13,9 +13,9 @@ export const isAdmin = combineResolvers(
 );
 
 export const isMessageOwner = async (
-  parent,
-  { id },
-  { models, me },
+  parent: any,
+  { id }: any,
+  { models, me }: any,
 ) => {
   const message = await models.Message.findById(id);
 
