@@ -1,12 +1,12 @@
-import jwt from 'jsonwebtoken';
-import { combineResolvers } from 'graphql-resolvers';
 import { AuthenticationError, UserInputError } from 'apollo-server';
+import { combineResolvers } from 'graphql-resolvers';
+import jwt from 'jsonwebtoken';
 
 import { isAdmin, isAuthenticated } from './authorization';
 
 const createToken = async (user, secret, expiresIn) => {
-  const { id, email, username, role } = user;
-  return await jwt.sign({ id, email, username, role }, secret, {
+  const { id, email, role } = user;
+  return await jwt.sign({ id, email, role }, secret, {
     expiresIn,
   });
 };
@@ -29,30 +29,16 @@ export default {
   },
 
   Mutation: {
-    signUp: async (
-      parent,
-      { username, email, password },
-      { models, secret },
-    ) => {
-      const user = await models.User.create({
-        username,
-        email,
-        password,
-      });
-
-      return { token: createToken(user, secret, '30m') };
-    },
-
     signIn: async (
       parent,
-      { login, password },
+      { email, password },
       { models, secret },
     ) => {
-      const user = await models.User.findByLogin(login);
+      const user = await models.User.findByLogin(email);
 
       if (!user) {
         throw new UserInputError(
-          'No user found with this login credentials.',
+          'No user found with this email.',
         );
       }
 
@@ -67,11 +53,10 @@ export default {
 
     updateUser: combineResolvers(
       isAuthenticated,
-      async (parent, { username }, { models, me }) => {
+      async (parent, { newPassword }, { models, me }) => {
         return await models.User.findByIdAndUpdate(
           me.id,
-          { username },
-          { new: true },
+          { new: true, password: newPassword },
         );
       },
     ),

@@ -1,18 +1,13 @@
-import mongoose from 'mongoose';
-
 import bcrypt from 'bcrypt';
+import mongoose from 'mongoose';
 import isEmail from 'validator/lib/isEmail';
 
 const userSchema = new mongoose.Schema({
-  username: {
-    type: String,
-    unique: true,
-    required: true,
-  },
   email: {
     type: String,
     unique: true,
     required: true,
+    index: true,
     validate: [isEmail, 'No valid email address provided.'],
   },
   password: {
@@ -21,20 +16,22 @@ const userSchema = new mongoose.Schema({
     minlength: 7,
     maxlength: 42,
   },
+  verificationStatus: {
+    type: String,
+    enum: ['VERIFIED', 'UNVERIFIED'],
+    default: 'UNVERIFIED',
+    required: true
+  },
   role: {
     type: String,
-  },
+    enum: ['ADMIN', 'CURATOR', 'PAYMENT_MANAGER', 'UNDEFINED'],
+    default: 'UNDEFINED',
+    required: true
+  }
 });
 
-userSchema.statics.findByLogin = async function(login) {
-  let user = await this.findOne({
-    username: login,
-  });
-
-  if (!user) {
-    user = await this.findOne({ email: login });
-  }
-
+userSchema.statics.findByLogin = async function(email) {
+  const user = await this.findOne({ email });
   return user;
 };
 

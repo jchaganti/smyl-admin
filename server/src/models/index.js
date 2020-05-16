@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
-import User from './user';
 import Message from './message';
+import User from './user';
 
 const connectDb = () => {
   if (process.env.TEST_DATABASE_URL) {

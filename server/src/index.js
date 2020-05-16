@@ -1,19 +1,17 @@
-import 'dotenv/config';
+import { ApolloServer, AuthenticationError } from 'apollo-server-express';
 import cors from 'cors';
-import morgan from 'morgan';
-import http from 'http';
-import jwt from 'jsonwebtoken';
 import DataLoader from 'dataloader';
 import express from 'express';
-import {
-  ApolloServer,
-  AuthenticationError,
-} from 'apollo-server-express';
+import http from 'http';
+import jwt from 'jsonwebtoken';
+import morgan from 'morgan';
 
-import schema from './schema';
-import resolvers from './resolvers';
-import models, { connectDb } from './models';
 import loaders from './loaders';
+import models, { connectDb } from './models';
+import resolvers from './resolvers';
+import schema from './schema';
+
+import 'dotenv/config';
 
 const app = express();
 
@@ -107,14 +105,12 @@ connectDb().then(async () => {
 
 const createUsersWithMessages = async date => {
   const user1 = new models.User({
-    username: 'rwieruch',
     email: 'hello@robin.com',
     password: 'rwieruch',
     role: 'ADMIN',
   });
 
   const user2 = new models.User({
-    username: 'ddavids',
     email: 'hello@david.com',
     password: 'ddavids',
   });

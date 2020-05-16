@@ -1,8 +1,8 @@
 import { expect } from 'chai';
-
-import * as api from './api';
-import models, { connectDb } from '../models';
 import mongoose from 'mongoose';
+
+import models, { connectDb } from '../models';
+import * as api from './api';
 
 let db;
 let expectedUsers;
@@ -34,7 +34,6 @@ describe('users', () => {
         data: {
           user: {
             id: expectedUser.id,
-            username: expectedUser.username,
             email: expectedUser.email,
             role: null,
           },
@@ -68,13 +67,11 @@ describe('users', () => {
           users: [
             {
               id: expectedAdminUser.id,
-              username: expectedAdminUser.username,
               email: expectedAdminUser.email,
               role: expectedAdminUser.role,
             },
             {
               id: expectedUser.id,
-              username: expectedUser.username,
               email: expectedUser.email,
               role: null,
             },
@@ -106,7 +103,6 @@ describe('users', () => {
         data: {
           me: {
             id: expectedAdminUser.id,
-            username: expectedAdminUser.username,
             email: expectedAdminUser.email,
           },
         },
@@ -129,38 +125,8 @@ describe('users', () => {
     });
   });
 
-  describe('signUp, updateUser, deleteUser', () => {
+  describe('updateUser, deleteUser', () => {
     it('signs up a user, updates a user and deletes the user as admin', async () => {
-      // sign up
-
-      let {
-        data: {
-          data: {
-            signUp: { token },
-          },
-        },
-      } = await api.signUp({
-        username: 'Mark',
-        email: 'mark@gmule.com',
-        password: 'asdasdasd',
-      });
-
-      const expectedNewUser = await models.User.findByLogin(
-        'mark@gmule.com',
-      );
-
-      const {
-        data: {
-          data: { me },
-        },
-      } = await api.me(token);
-
-      expect(me).to.eql({
-        id: expectedNewUser.id,
-        username: expectedNewUser.username,
-        email: expectedNewUser.email,
-      });
-
       // update as user
 
       const {
