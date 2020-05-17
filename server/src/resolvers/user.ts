@@ -1,43 +1,45 @@
-import { AuthenticationError, UserInputError } from 'apollo-server';
-import { combineResolvers } from 'graphql-resolvers';
-import jwt from 'jsonwebtoken';
-
-import { isAdmin, isAuthenticated } from './authorization';
+import { IResolvers } from 'graphql-tools';
 import { IUserModel, IUser } from '../models/user';
 import { cast } from '../utils';
+import { UserInputError, AuthenticationError } from 'apollo-server';
+import { combineResolvers } from 'graphql-resolvers';
+import { isAuthenticated, isAdmin } from './authorization';
 import { IMessageModel } from '../models/message';
+import jwt, { Secret } from 'jsonwebtoken';
+import { Context, SignUpInput, SignInInput } from '../models/context';
 
-const createToken = async (user: IUser, secret: string, expiresIn: string) => {
+const createToken = async (user: IUser, secret: Secret, expiresIn: string) => {
   const { id, email, role } = user;
   return await jwt.sign({ id, email, role }, secret, {
     expiresIn,
   });
 };
 
-export default {
+const resolverMap: IResolvers = {
   Query: {
-    users: async (parent: any, args: any, { models }: any) => {
+    users: async (parent: any, args: any, { models }: Context) => {
       const UserModel: IUserModel = cast(models.User);
       return await UserModel.find();
     },
-    user: async (parent: any, { id }: any, { models }: any) => {
+    user: async (parent: any, { id }: any, { models }: Context) => {
       const UserModel: IUserModel = cast(models.User);
       return await UserModel.findById(id);
     },
-    me: async (parent: any, args: any, { models, me }: any) => {
-      if (!me) {
+    me: async (parent: any, args: any, { models, me }: Context) => {
+      const _me: IUser = cast(me);
+      if (!_me) {
         return null;
       }
       const UserModel: IUserModel = cast(models.User);
-      return await UserModel.findById(me.id);
+      return await UserModel.findById(_me.id);
     },
   },
 
   Mutation: {
     signUp: async (
       parent: any,
-      { email, password, role }: any,
-      { models, me }: any,
+      { email, password, role }: SignUpInput,
+      { models, me }: Context,
     ) => {
       const UserModel: IUserModel = cast(models.User);
       const user: IUser = await UserModel.findByLogin(email);
@@ -57,8 +59,8 @@ export default {
     },
     signIn: async (
       parent: any,
-      { email, password }: any,
-      { models, secret }: any,
+      { email, password }: SignInInput,
+      { models, secret }: Context,
     ) => {
       const UserModel: IUserModel = cast(models.User);
       const user: IUser = await UserModel.findByLogin(email);
@@ -80,10 +82,11 @@ export default {
 
     updateUser: combineResolvers(
       isAuthenticated,
-      async (parent, { newPassword }, { models, me }: any) => {
+      async (parent, { newPassword }, { models, me }: Context) => {
         const UserModel: IUserModel = cast(models.User);
+        const _me: IUser = cast(me);
         return await UserModel.findByIdAndUpdate(
-          me.id,
+          _me.id,
           { new: true, password: newPassword },
         );
       },
@@ -91,7 +94,7 @@ export default {
 
     deleteUser: combineResolvers(
       isAdmin,
-      async (parent, { id }, { models }: any) => {
+      async (parent, { id }, { models }: Context) => {
         const UserModel: IUserModel = cast(models.User);
         const user = await UserModel.findById(id);
 
@@ -106,7 +109,7 @@ export default {
   },
 
   User: {
-    messages: async (user: { id: any; }, args: any, { models }: any) => {
+    messages: async (user: { id: any; }, args: any, { models }: Context) => {
       const MessageModel: IMessageModel = cast(models.Message);
       return await MessageModel.find({
         userId: user.id,
@@ -114,3 +117,5 @@ export default {
     },
   },
 };
+
+export default resolverMap;
