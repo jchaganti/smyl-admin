@@ -7,7 +7,7 @@
     "node": "10.11.0"
   },
   "scripts": {
-    "start": "nodemon --exec ts-node src/index.ts -e ts,graphql",
+    "start": "nodemon --exec ts-node -T --files src/index.ts -e ts,graphql",
     "test:run-server": "TEST_DATABASE_URL=mongodb://localhost:27017/mytestdatabase npm start",
     "test:execute-test": "TEST_DATABASE_URL=mongodb://localhost:27017/mytestdatabase mocha --require @babel/register 'src/**/*.spec.ts'",
     "test": "echo \"No test specified\" && exit 0"

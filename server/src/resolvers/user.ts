@@ -43,21 +43,15 @@ export default {
       const user: IUser = await UserModel.findByLogin(email);
       const loggedInUser: IUser = cast(me);
       // TODO: Use enum for ADMIN
-      // if(loggedInUser.role !== 'ADMIN') {
-      //   throw new UserInputError(
-      //     'Not Authorized to create users',
-      //   );
-      // }
+      if(loggedInUser.role !== 'ADMIN') {
+        throw new UserInputError('Not Authorized to create users');
+      }
       if (user) {
         throw new UserInputError(
           'User with this email id already exists!',
         );
       } else {
-        const user = new UserModel({
-          email,
-          password,
-          role,
-        });
+        const user = new UserModel({ email, password, role });
         return await user.save();
       }
     },
