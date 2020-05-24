@@ -8,19 +8,18 @@ export interface ButtonWithLoaderProps {
   loading: boolean;
   disabled: boolean;
   label: string;
-  className: string;
+  className: 'submit' | 'cancel';
 }
 const ButtonWithLoader: FunctionComponent<ButtonWithLoaderProps> =  
   ({ onClick, loading, disabled, label, className }: ButtonWithLoaderProps) => {
   const classes = useStyles();
-  console.log('ClassName', className)  
   return (
     <Button
       type='submit'
       variant="contained"
       onClick={onClick}
       fullWidth
-      className={classes.submit}
+      className={classes[className]}
       disabled={loading || disabled}>
       {loading && <CircularProgress size={24} />}
       {!loading && label}
@@ -34,6 +33,10 @@ const ButtonWithLoader: FunctionComponent<ButtonWithLoaderProps> =
     submit: {
       margin: theme.spacing(3, 0, 2),
       backgroundColor: theme.palette.primary.main,
+    },
+    cancel: {
+      margin: theme.spacing(3, 0, 2),
+      backgroundColor: theme.palette.secondary.main,
     },
   }));
 export default ButtonWithLoader;

@@ -60,7 +60,7 @@ const useStyles = makeStyles((theme) => ({
   },
   submit: {
     margin: theme.spacing(3, 0, 2),
-  },
+  }
 }));
 
 const CashbackRulesPage: FunctionComponent = (props) => {
@@ -110,6 +110,10 @@ const CashbackRulesPage: FunctionComponent = (props) => {
 
     }, 2000);
   }, [cashback, retailer, category]);
+
+  const handleCancel = useCallback((e: any) => {
+    
+  }, []);
 
   const submitDisabled = useMemo<boolean>(() => {
     return isUndefined(cashback) || !retailer || !category;
@@ -166,10 +170,10 @@ const CashbackRulesPage: FunctionComponent = (props) => {
         <Grid item xs={3}>
           <ButtonWithLoader
             label='Cancel'
-            loading={submissionInProgress}
-            disabled={submitDisabled}
-            onClick={handleSignIn}
-            className={classes.submit}
+            loading={false}
+            disabled={false}
+            onClick={handleCancel}
+            className={'cancel'}
           />
         </Grid>
         <Grid item xs={3}>
@@ -178,7 +182,7 @@ const CashbackRulesPage: FunctionComponent = (props) => {
             loading={submissionInProgress}
             disabled={submitDisabled}
             onClick={handleSignIn}
-            className={classes.submit}
+            className={'submit'}
           />
         </Grid>
 

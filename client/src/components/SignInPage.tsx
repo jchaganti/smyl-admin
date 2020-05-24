@@ -119,7 +119,7 @@ export default function SignIn() {
             loading={signInProgress}
             disabled={submitDisabled}
             onClick={handleSignIn}
-            className={classes.submit}
+            className={'submit'}
           >
             
           </ButtonWithLoader>
