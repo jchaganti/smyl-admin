@@ -22,6 +22,8 @@ import { Route, Router, useHistory } from 'react-router-dom';
 import HomePage from './components/HomePage';
 import { mainListItems } from './components/ListItems';
 import SignInPage from './components/SignInPage';
+import CashbackRulesPage from './components/CashbackRulesPage';
+
 import client, { getAccessToken } from './graphql/client';
 import { withRoot } from './withRoot';
 
@@ -50,7 +52,7 @@ function Routes() {
 
 	return (
 		<div className={classes.content}>
-			<Route exact={true} path='/' component={SignInPage} />
+			<Route exact={true} path='/' component={CashbackRulesPage} />
 			<Route exact={true} path='/home' component={HomePage} />
 		</div>
 	);
