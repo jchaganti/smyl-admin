@@ -1,0 +1,43 @@
+{
+	"name": "smyl-admin-client",
+	"version": "2.0.0",
+	"dependencies": {
+		"@apollo/react-hooks": "^3.1.5",
+		"@material-ui/core": "4.9.0",
+		"@material-ui/icons": "4.5.1",
+		"@material-ui/styles": "4.9.0",
+		"apollo-boost": "^0.4.9",
+		"localforage": "1.7.3",
+		"lodash": "^4.17.15",
+		"react": "16.12.0",
+		"react-dom": "16.12.0",
+		"react-router-dom": "5.1.2",
+		"react-scripts": "3.4.0",
+		"typescript": "3.7.5"
+	},
+	"scripts": {
+		"start": "react-scripts start",
+		"build": "react-scripts build",
+		"test": "react-scripts test",
+		"eject": "react-scripts eject"
+	},
+	"browserslist": [
+		">0.2%",
+		"not dead",
+		"not ie <= 11",
+		"not op_mini all"
+	],
+	"devDependencies": {
+		"@types/graphql": "^14.5.0",
+		"@types/jest": "24.0.25",
+		"@types/lodash": "^4.14.152",
+		"@types/node": "12.12.18",
+		"@types/react": "16.9.19",
+		"@types/react-dom": "16.9.5",
+		"@types/react-router-dom": "5.1.3",
+		"@types/redux-logger": "3.0.7",
+		"@types/webpack-env": "1.15.1",
+		"eslint-plugin-react": "7.17.0"
+	},
+	"proxy": "http://localhost:8000"
+}
