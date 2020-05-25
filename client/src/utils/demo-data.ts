@@ -120,3 +120,5 @@ export const curatorToRetailer: {[key: string]: string []} = {
   'gchaganti@gmail.com': ['Macys'],
   'sai@gmail.com': ['Nike']
 }
+
+export const myRetailers = curatorToRetailer['jchaganti@gmail.com'];

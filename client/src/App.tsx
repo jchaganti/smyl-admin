@@ -25,6 +25,8 @@ import SignInPage from './components/SignInPage';
 import CashbackRulesPage from './components/CashbackRulesPage';
 import AddUserPage from './components/AddUserPage'
 import AssignCuratorPage from './components/AssignCuratorPage'
+import AddProductPage from './components/AddProductPage'
+
 import client, { getAccessToken } from './graphql/client';
 import { withRoot } from './withRoot';
 
@@ -53,7 +55,7 @@ function Routes() {
 
 	return (
 		<div className={classes.content}>
-			<Route exact={true} path='/' component={AssignCuratorPage} />
+			<Route exact={true} path='/' component={AddProductPage} />
 			<Route exact={true} path='/home' component={HomePage} />
 		</div>
 	);
