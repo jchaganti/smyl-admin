@@ -23,7 +23,8 @@ import HomePage from './components/HomePage';
 import { mainListItems } from './components/ListItems';
 import SignInPage from './components/SignInPage';
 import CashbackRulesPage from './components/CashbackRulesPage';
-
+import AddUserPage from './components/AddUserPage'
+import AssignCuratorPage from './components/AssignCuratorPage'
 import client, { getAccessToken } from './graphql/client';
 import { withRoot } from './withRoot';
 
@@ -52,7 +53,7 @@ function Routes() {
 
 	return (
 		<div className={classes.content}>
-			<Route exact={true} path='/' component={CashbackRulesPage} />
+			<Route exact={true} path='/' component={AssignCuratorPage} />
 			<Route exact={true} path='/home' component={HomePage} />
 		</div>
 	);

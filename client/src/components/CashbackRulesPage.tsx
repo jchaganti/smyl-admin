@@ -6,48 +6,8 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import { isUndefined } from 'lodash';
 import usePrevious from '../hooks/usePrevious';
 import ButtonWithLoader from './ButtonWithLoader';
+import {merchantToCategoryMapping} from '../utils/demo-data';
 
-const merchantToCategoryMapping: { [key: string]: any } = {
-  'Amazon': {
-    'Sports': {
-      'cashBackPercent': 10.8,
-      'user': 'user1@gmail.com'
-    },
-    'Electronics': {
-      'cashBackPercent': 12,
-      'user': 'user2@gmail.com'
-    },
-    'Apparel': {
-      'cashBackPercent': 15,
-      'user': 'user1@gmail.com'
-    },
-    'Toys': {
-      'cashBackPercent': 20,
-      'user': 'user2@gmail.com'
-    },
-    'Medicines': null
-  },
-  'Nike': {
-    'Sports': {
-      'cashBackPercent': 10.8,
-      'user': 'user1@gmail.com'
-    },
-    'Fitness': {
-      'cashBackPercent': 20,
-      'user': 'user2@gmail.com'
-    }
-  },
-  'Lakme': {
-    'Fashion': {
-      'cashBackPercent': 13,
-      'user': 'user1@gmail.com'
-    },
-    'Fitness': {
-      'cashBackPercent': 5,
-      'user': 'user2@gmail.com'
-    }
-  }
-}
 
 const useStyles = makeStyles((theme) => ({
   root: {
