@@ -1,36 +1,18 @@
-import { FormControl, Grid, InputLabel, MenuItem, Select, TextField, Paper } from '@material-ui/core';
+import { Grid, Paper, TextField } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Tab from '@material-ui/core/Tab';
-import Tabs from '@material-ui/core/Tabs';
-import Typography from '@material-ui/core/Typography';
-import AddBox from '@material-ui/icons/AddBox';
-import ArrowDownward from '@material-ui/icons/ArrowDownward';
-import Check from '@material-ui/icons/Check';
-import ChevronLeft from '@material-ui/icons/ChevronLeft';
-import ChevronRight from '@material-ui/icons/ChevronRight';
-import Clear from '@material-ui/icons/Clear';
-import DeleteOutline from '@material-ui/icons/DeleteOutline';
-import Edit from '@material-ui/icons/Edit';
-import FilterList from '@material-ui/icons/FilterList';
-import FirstPage from '@material-ui/icons/FirstPage';
-import LastPage from '@material-ui/icons/LastPage';
-import Remove from '@material-ui/icons/Remove';
-import SaveAlt from '@material-ui/icons/SaveAlt';
-import Search from '@material-ui/icons/Search';
-import ViewColumn from '@material-ui/icons/ViewColumn';
-import MaterialTable, { Icons } from 'material-table';
-import React, { forwardRef, FunctionComponent, useState } from 'react';
-import ButtonWithLoader from './ButtonWithLoader';
-import { users, merchantToCategoryMapping, curatorToRetailer, myRetailers } from '../utils/demo-data';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-import { ROLES } from '../models';
-import { difference } from 'lodash';
+import Tabs from '@material-ui/core/Tabs';
+import Typography from '@material-ui/core/Typography';
+import React, { FunctionComponent } from 'react';
+import { merchantToCategoryMapping, myRetailers } from '../utils/demo-data';
+import ButtonWithLoader from './ButtonWithLoader';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -222,7 +204,7 @@ const AddProductPage: FunctionComponent = () => {
           </Grid>
           <Grid item xs={3}>
             <ButtonWithLoader
-              label='Submit'
+              label='Add'
               loading={false}
               disabled={false}
               onClick={() => { }}

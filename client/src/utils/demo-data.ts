@@ -122,3 +122,18 @@ export const curatorToRetailer: {[key: string]: string []} = {
 }
 
 export const myRetailers = curatorToRetailer['jchaganti@gmail.com'];
+
+let month = 0, date = 10;
+let purchaseID = 191928;
+
+export const claimsData = Object.keys(merchantToCategoryMapping).map((retailer, index) => {
+  return {
+    date: new Date(2019, month + index, date + index),
+    purchaseID: purchaseID++,
+    userFirstName: 'Arun' + month,
+    userLastName: 'Uday' + date,
+    retailer,
+    categories: merchantToCategoryMapping[retailer],
+    bill: 'http://google.com' 
+  }
+});
