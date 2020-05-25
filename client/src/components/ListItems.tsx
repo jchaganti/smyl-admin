@@ -8,39 +8,40 @@ import LibraryAddIcon from '@material-ui/icons/LibraryAdd';
 import PeopleIcon from '@material-ui/icons/People';
 import RedeemIcon from '@material-ui/icons/Redeem';
 import React from 'react';
+import NavLinkMui from './NavLinkMui';
 export const mainListItems = (
   <div>
-    <ListItem button>
-      <ListItemIcon>
+    <ListItem button component={NavLinkMui} to="/">
+      <ListItemIcon >
         <DashboardIcon />
       </ListItemIcon>
       <ListItemText primary="Add cashback rules" />
     </ListItem>
-    <ListItem button>
+    <ListItem button component={NavLinkMui} to="/add-users">
       <ListItemIcon>
         <PeopleIcon />
       </ListItemIcon>
       <ListItemText primary="Add users" />
     </ListItem>
-    <ListItem button>
+    <ListItem button component={NavLinkMui} to="/assign-curators">
       <ListItemIcon>
         <AssignmentIndIcon />
       </ListItemIcon>
       <ListItemText primary="Assign curator" />
     </ListItem>
-    <ListItem button>
+    <ListItem button component={NavLinkMui} to="/add-product">
       <ListItemIcon>
         <LibraryAddIcon />
       </ListItemIcon>
       <ListItemText primary="Add product" />
     </ListItem>
-    <ListItem button>
+    <ListItem button component={NavLinkMui} to="/manage-claims">
       <ListItemIcon>
         <RedeemIcon />
       </ListItemIcon>
       <ListItemText primary="Manage claims" />
     </ListItem>
-    <ListItem button>
+    <ListItem button component={NavLinkMui} to="/manage-claims">
       <ListItemIcon>
         <ImageSearchIcon />
       </ListItemIcon>

@@ -56,8 +56,12 @@ function Routes() {
 
 	return (
 		<div className={classes.content}>
-			<Route exact={true} path='/' component={ProcessClaimsPage} />
-			<Route exact={true} path='/home' component={HomePage} />
+			<Route exact={true} path='/add-cashback-rules' component={CashbackRulesPage} />
+			<Route exact={true} path='/add-users' component={AddUserPage} />
+			<Route exact={true} path='/assign-curators' component={AssignCuratorPage} />
+			<Route exact={true} path='/add-product' component={AddProductPage} />
+			<Route exact={true} path='/manage-claims' component={ProcessClaimsPage} />
+			<Route exact={true} path='/' component={CashbackRulesPage} />
 		</div>
 	);
 }
