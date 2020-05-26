@@ -17,19 +17,19 @@ import ExitToAppSharpIcon from '@material-ui/icons/ExitToAppSharp';
 import MenuIcon from '@material-ui/icons/Menu';
 import clsx from 'clsx';
 import { createBrowserHistory } from 'history';
-import React, { FunctionComponent, useEffect } from 'react';
-import { Route, Router, useHistory } from 'react-router-dom';
-import HomePage from './components/HomePage';
-import { mainListItems } from './components/ListItems';
-import SignInPage from './components/SignInPage';
+import React, { FunctionComponent } from 'react';
+import { Route, Router } from 'react-router-dom';
+import AddProductPage from './components/AddProductPage';
+import AddUserPage from './components/AddUserPage';
+import AssignCuratorPage from './components/AssignCuratorPage';
 import CashbackRulesPage from './components/CashbackRulesPage';
-import AddUserPage from './components/AddUserPage'
-import AssignCuratorPage from './components/AssignCuratorPage'
-import AddProductPage from './components/AddProductPage'
-import ProcessClaimsPage from './components/ProcessClaimsPage'
-
+import { mainListItems } from './components/ListItems';
+import ProcessClaimsPage from './components/ProcessClaimsPage';
+import SearchClaimsPage from './components/SearchClaimsPage';
+import SignInPage from './components/SignInPage';
 import client, { getAccessToken } from './graphql/client';
 import { withRoot } from './withRoot';
+
 
 
 const history = createBrowserHistory();
@@ -61,6 +61,7 @@ function Routes() {
 			<Route exact={true} path='/assign-curators' component={AssignCuratorPage} />
 			<Route exact={true} path='/add-product' component={AddProductPage} />
 			<Route exact={true} path='/manage-claims' component={ProcessClaimsPage} />
+			<Route exact={true} path='/search-claims' component={SearchClaimsPage} />
 			<Route exact={true} path='/' component={CashbackRulesPage} />
 		</div>
 	);

@@ -257,7 +257,16 @@ const ProcessClaimsPage: FunctionComponent = () => {
         title="Process claims"
         columns={state.columns}
         data={state.data}
+        options={{actionsColumnIndex: -1}}
         actions={[
+          {
+            icon: () => <Receipt />,
+            tooltip: 'Show the bill',
+            onClick: (event, rowData: ClaimData | ClaimData[]) => {
+              const bill = (rowData as ClaimData).bill;
+              window.open(bill)
+            }
+          },
           {
             icon: () => <Check />,
             tooltip: 'Approve the claim',
@@ -274,14 +283,7 @@ const ProcessClaimsPage: FunctionComponent = () => {
               handleClickOpen(purchaseID, ACTIONS.REJECT);
             }
           },
-          {
-            icon: () => <Receipt />,
-            tooltip: 'Show the bill',
-            onClick: (event, rowData: ClaimData | ClaimData[]) => {
-              const bill = (rowData as ClaimData).bill;
-              window.open(bill)
-            }
-          }
+          
         ]}
       />
       <Dialog

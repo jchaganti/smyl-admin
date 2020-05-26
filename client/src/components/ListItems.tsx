@@ -41,7 +41,7 @@ export const mainListItems = (
       </ListItemIcon>
       <ListItemText primary="Manage claims" />
     </ListItem>
-    <ListItem button component={NavLinkMui} to="/manage-claims">
+    <ListItem button component={NavLinkMui} to="/search-claims">
       <ListItemIcon>
         <ImageSearchIcon />
       </ListItemIcon>

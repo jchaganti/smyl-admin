@@ -130,10 +130,25 @@ export const claimsData = Object.keys(merchantToCategoryMapping).map((retailer, 
   return {
     date: new Date(2019, month + index, date + index),
     purchaseID: purchaseID++,
-    userFirstName: 'Arun' + month,
-    userLastName: 'Uday' + date,
+    userFirstName: 'Arun',
+    userLastName: 'Uday',
     retailer,
     categories: merchantToCategoryMapping[retailer],
+    bill: 'http://google.com' 
+  }
+});
+
+export const searchClaimsData = Object.keys(merchantToCategoryMapping).map((retailer, index) => {
+  return {
+    date: new Date(2019, month + index, date + index),
+    purchaseID: purchaseID++,
+    userFirstName: 'Arun',
+    userLastName: 'Uday',
+    retailer,
+    cashbackValue: 129,
+    amount: 2100,
+    status: index % 2 === 0? 'Approved': index % 3 === 0 ? 'Rejected': 'None',
+    category: Object.keys(merchantToCategoryMapping[retailer])[0],
     bill: 'http://google.com' 
   }
 });
