@@ -5,7 +5,7 @@ export default gql`
     users: [User!]
     user(id: ID!): User
     me: User
-    assignedRetailers: Retailers!
+    assignedRetailers: [Retailer!]
     curators: [User!]
   }
 
@@ -28,9 +28,5 @@ export default gql`
     role: String!
     verificationStatus:String!
     messages: [Message!]
-  }
-
-  type Retailers {
-    retailers: [Retailer!]!
   }
 `;

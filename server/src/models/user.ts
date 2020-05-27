@@ -3,6 +3,8 @@ import mongoose, { Schema, Model } from 'mongoose';
 import isEmail from 'validator/lib/isEmail';
 import userAudit from '../plugins/userAudit';
 import { IUserDocument } from './item';
+import autopopulate from 'mongoose-autopopulate';
+
 const UserSchema = new Schema({
   email: {
     type: String,
@@ -31,12 +33,13 @@ const UserSchema = new Schema({
   },
   retailers: { 
     type: [mongoose.Schema.Types.ObjectId], 
-    ref: 'Retailer' 
+    ref: 'Retailer', 
+    autopopulate: true
   }
 });
 
 UserSchema.plugin(userAudit);
-
+UserSchema.plugin(autopopulate);
 // Instance methods
 export interface IUser extends IUserDocument {
   retailers: string []

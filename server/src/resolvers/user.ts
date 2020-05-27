@@ -8,7 +8,6 @@ import { IUserModel, IUser } from '../models/user';
 import { cast } from '../utils';
 import { isAdmin, isAuthenticated } from './authorization';
 import { getLoggedInUserWithRoleAs } from './helper';
-
 const createToken = async (user: IUser, secret: Secret, expiresIn: string) => {
   const { id, email, role } = user;
   return await jwt.sign({ id, email, role }, secret, {
@@ -37,8 +36,8 @@ const resolverMap: IResolvers = {
     assignedRetailers: async (parent: any, args: any, { models, me }: Context) => {
       const loggedInUser = getLoggedInUserWithRoleAs(me, [USER_ROLE.CURATOR, USER_ROLE.ADMIN]);
       const UserModel: IUserModel = cast(models.User);
-      const user: IUser | null=  await UserModel.findById(loggedInUser.id).populate('retailers');
-      return user !== null?  {retailers: user.retailers}: {retailers: []};
+      const user: IUser | null=  await UserModel.findById(loggedInUser.id);
+      return user !== null?  user.retailers: [];
     },
     curators: async (parent: any, args: any, { models, me }: Context) => {
       const loggedInUser = getLoggedInUserWithRoleAs(me, [USER_ROLE.ADMIN]);
@@ -129,7 +128,6 @@ const resolverMap: IResolvers = {
       }
       retailers.push(retailerId);
       user.modifiedBy = loggedInUser;
-      console.log('@@@ Curator user', user)
       try {
         await UserModel.findByIdAndUpdate(curatorId, user);
         return { status: true }
@@ -148,7 +146,6 @@ const resolverMap: IResolvers = {
       const user: IUser = cast(await UserModel.findById(curatorId));
       const {retailers} = user;
       const indx = retailers.findIndex(id=> id.toString() === retailerId);
-      console.log('@@@ Indx', indx)
       if(indx === -1) {
         throw new UserInputError(`unassignRetailerToCurator failed since retailer Id ${retailerId} is not associated with curator Id ${curatorId}`)
       }
