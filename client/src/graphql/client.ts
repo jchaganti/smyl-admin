@@ -2,7 +2,7 @@ import {  ApolloClient, ApolloLink, HttpLink, InMemoryCache} from 'apollo-boost'
 
 const httpUrl = '/graphql';
 
-export const getAccessToken = (): string  => {return 'aba'}
+export const getAccessToken = (): string  => {return 'aaa'}
 
 const httpLink = ApolloLink.from([
   new ApolloLink((operation, forward) => {

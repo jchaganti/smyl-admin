@@ -1,7 +1,8 @@
 import bcrypt from 'bcrypt';
-import mongoose, { Schema, Document, Model } from 'mongoose';
+import mongoose, { Schema, Model } from 'mongoose';
 import isEmail from 'validator/lib/isEmail';
-
+import userAudit from '../plugins/userAudit';
+import { IUserDocument } from './item';
 const UserSchema = new Schema({
   email: {
     type: String,
@@ -30,11 +31,7 @@ const UserSchema = new Schema({
   }
 });
 
-export interface IUserDocument extends Document {
-  email: string;
-  password: string;
-  role: string;
-}
+UserSchema.plugin(userAudit);
 
 // Instance methods
 export interface IUser extends IUserDocument {
@@ -46,7 +43,6 @@ export interface IUser extends IUserDocument {
 export interface IUserModel extends Model<IUser> {
   findByLogin(email: string): IUser;
 }
-
 UserSchema.pre<IUser>('save', async function( next: () => void) {
   this.password = await this.generatePasswordHash();
   next();
@@ -66,6 +62,6 @@ UserSchema.method('validatePassword', async function(this: IUser, password: stri
   return await bcrypt.compare(password, this.password);
 });
 
-const User: IUserModel = mongoose.model<IUserDocument, IUserModel>('User', UserSchema);
+const User: IUserModel = mongoose.model<IUser, IUserModel>('User', UserSchema);
 
 export default User;

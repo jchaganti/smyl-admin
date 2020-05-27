@@ -1,12 +1,13 @@
+import { AuthenticationError, UserInputError } from 'apollo-server';
+import { combineResolvers } from 'graphql-resolvers';
 import { IResolvers } from 'graphql-tools';
+import jwt, { Secret } from 'jsonwebtoken';
+import { Context, SignInInput, SignUpInput, USER_ROLE } from '../models/context';
+import { IMessageModel } from '../models/message';
 import { IUserModel, IUser } from '../models/user';
 import { cast } from '../utils';
-import { UserInputError, AuthenticationError } from 'apollo-server';
-import { combineResolvers } from 'graphql-resolvers';
-import { isAuthenticated, isAdmin } from './authorization';
-import { IMessageModel } from '../models/message';
-import jwt, { Secret } from 'jsonwebtoken';
-import { Context, SignUpInput, SignInInput } from '../models/context';
+import { isAdmin, isAuthenticated } from './authorization';
+import { getLoggedInUserWithRoleAs } from './helper';
 
 const createToken = async (user: IUser, secret: Secret, expiresIn: string) => {
   const { id, email, role } = user;
@@ -43,17 +44,14 @@ const resolverMap: IResolvers = {
     ) => {
       const UserModel: IUserModel = cast(models.User);
       const user: IUser = await UserModel.findByLogin(email);
-      const loggedInUser: IUser = cast(me);
-      // TODO: Use enum for ADMIN
-      if(loggedInUser.role !== 'ADMIN') {
-        throw new UserInputError('Not Authorized to create users');
-      }
+      const loggedInUser: IUser = getLoggedInUserWithRoleAs(me, USER_ROLE.ADMIN);
       if (user) {
         throw new UserInputError(
           'User with this email id already exists!',
         );
       } else {
         const user = new UserModel({ email, password, role });
+        user.modifiedBy = loggedInUser;
         return await user.save();
       }
     },

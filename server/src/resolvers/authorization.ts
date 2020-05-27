@@ -1,5 +1,6 @@
 import { ForbiddenError } from 'apollo-server';
 import { combineResolvers, skip } from 'graphql-resolvers';
+import { USER_ROLE } from '../models/context';
 
 export const isAuthenticated = (parent: any, args: any, { me }: any) =>
   me ? skip : new ForbiddenError('Not authenticated as user.');
@@ -7,7 +8,7 @@ export const isAuthenticated = (parent: any, args: any, { me }: any) =>
 export const isAdmin = combineResolvers(
   isAuthenticated,
   (parent, args, { me: { role } }) =>
-    role === 'ADMIN'
+    role === USER_ROLE.ADMIN
       ? skip
       : new ForbiddenError('Not authorized as admin.'),
 );

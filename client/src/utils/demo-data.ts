@@ -145,10 +145,10 @@ export const searchClaimsData = Object.keys(merchantToCategoryMapping).map((reta
     userFirstName: 'Arun',
     userLastName: 'Uday',
     retailer,
-    cashbackValue: 129,
-    amount: 2100,
-    status: index % 2 === 0? 'Approved': index % 3 === 0 ? 'Rejected': 'None',
-    category: Object.keys(merchantToCategoryMapping[retailer])[0],
+    cashbackValue: index % 2 === 0 || index % 3 === 0? 2100: undefined,
+    amount: index % 2 === 0 || index % 3 === 0? 2100: undefined,
+    status: index % 2 === 0? 'Approved': index % 3 === 0 ? 'Rejected': undefined,
+    category: index % 2 === 0 || index % 3 === 0? Object.keys(merchantToCategoryMapping[retailer])[0]: undefined,
     bill: 'http://google.com' 
   }
 });
