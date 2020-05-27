@@ -2,12 +2,12 @@ import { gql } from 'apollo-server-express';
 
 export default gql`
   extend type Query {
-    curatorToRetailers(): [Curator!]!
+    curatorToRetailers: [Curator!]!
   }
 
   extend type Mutation {
-    assignCurator(curatorId: ID!, retailerId: ID!): Status!
-    unassignCurator(curatorId: ID!, retailerId: ID!): Status!
+    assignCurator(curatorId: String!, retailerId: String!): Status!
+    unassignCurator(curatorId: String!, retailerId: String!): Status!
   }
 
   type Curator {

@@ -2,7 +2,7 @@ import { gql } from 'apollo-server-express';
 
 export default gql`
   extend type Query {
-    retailers(): [Retailer!]!
+    retailers: [Retailer!]!
   }
 
   extend type Mutation {
@@ -25,3 +25,4 @@ export default gql`
     status: Boolean!
   }
 `;
+

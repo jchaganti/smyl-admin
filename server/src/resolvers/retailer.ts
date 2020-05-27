@@ -14,6 +14,7 @@ const saveRetailer = async (retailer: IRetailerDocument, loggedInUser: IUser): P
     await retailer.save();
     return true;
   } catch (e) {
+    console.error('Error during saving of retailer', e);
     return false;
   }
 }
@@ -27,16 +28,16 @@ const resolverMap: IResolvers = {
   Mutation: {
     createRetailer: async (
       parent: any,
-      { name, categories }: CreateRetailerInput,
+      { name, categories: _categories }: CreateRetailerInput,
       { models, me }: Context,
     ) => {
       const loggedInUser = getLoggedInUserWithRoleAs(me, USER_ROLE.ADMIN);
       const RetailerModel: IRetailerModel = cast(models.Retailer);
-      const categoryObjs = categories.map(name => ({
+      const categories = _categories.map(name => ({
         name,
         userId: loggedInUser.id
       }));
-      const retailer: IRetailerDocument = new RetailerModel({ name, categoryObjs });
+      const retailer: IRetailerDocument = new RetailerModel({ name,  categories });
       const status = await saveRetailer(retailer, loggedInUser);
       return { status };
     },
@@ -51,9 +52,15 @@ const resolverMap: IResolvers = {
       if (retailer) {
         const { categories } = retailer;
         const categoryObj: any = categories.find((_category: any) => category === _category.name);
-        categoryObj.cashbackPercent = cashbackPercent;
-        const status = await saveRetailer(retailer, loggedInUser);
-        return { status };
+        if(categoryObj) {
+          categoryObj.cashbackPercent = cashbackPercent;
+          const status = await saveRetailer(retailer, loggedInUser);
+          return { status };
+        } else {
+          throw new UserInputError(`Not able to find category with name ${category} for retailer with id ${retailerId}`);
+        }
+        
+       
       } else {
         throw new UserInputError(`Not able to find retailer with id ${retailerId}`);
       }

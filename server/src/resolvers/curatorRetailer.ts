@@ -43,6 +43,7 @@ const resolverMap: IResolvers = {
         await curatorRetailer.save();
         return { status: true }
       } catch (e) {
+        console.error('Error during assignCurator', e)
         { status: false }
       }
     },
@@ -57,6 +58,7 @@ const resolverMap: IResolvers = {
         await CuratorRetailerModel.findByCuratorRetailerAndDelete(curator, retailer);
         return { status: true }
       } catch (e) {
+        console.error('Error during unassignCurator', e)
         return { status: false }
       }
     }
