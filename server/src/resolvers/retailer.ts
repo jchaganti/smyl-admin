@@ -31,7 +31,7 @@ const resolverMap: IResolvers = {
       { name, categories: _categories }: CreateRetailerInput,
       { models, me }: Context,
     ) => {
-      const loggedInUser = getLoggedInUserWithRoleAs(me, USER_ROLE.ADMIN);
+      const loggedInUser = getLoggedInUserWithRoleAs(me, [USER_ROLE.ADMIN]);
       const RetailerModel: IRetailerModel = cast(models.Retailer);
       const categories = _categories.map(name => ({
         name,
@@ -46,7 +46,7 @@ const resolverMap: IResolvers = {
       { retailerId, category, cashbackPercent }: AddCashbackInput,
       { models, me }: Context,
     ) => {
-      const loggedInUser = getLoggedInUserWithRoleAs(me, USER_ROLE.ADMIN);
+      const loggedInUser = getLoggedInUserWithRoleAs(me, [USER_ROLE.ADMIN]);
       const RetailerModel: IRetailerModel = cast(models.Retailer);
       const retailer: IRetailerDocument = cast(await RetailerModel.findById(retailerId))
       if (retailer) {

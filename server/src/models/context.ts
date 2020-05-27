@@ -32,8 +32,8 @@ export interface AddCashbackInput {
 }
 
 export interface AssignCuratorInput {
-  retailer: string;
-  curator: string;
+  retailerId: string;
+  curatorId: string;
 }
 
 export enum USER_ROLE {

@@ -4,7 +4,6 @@ import userResolvers from './user';
 import messageResolvers from './message';
 import retailerResolvers from './retailer';
 import productResolvers from './product';
-import curatorRetailResolversa from './curatorRetailer';
 const customScalarResolver = {
   Date: GraphQLDateTime,
   JSON: GraphQLJSON
@@ -15,6 +14,5 @@ export default [
   userResolvers,
   messageResolvers,
   retailerResolvers,
-  productResolvers,
-  curatorRetailResolversa
+  productResolvers
 ];

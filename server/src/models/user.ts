@@ -28,6 +28,10 @@ const UserSchema = new Schema({
     enum: ['ADMIN', 'CURATOR', 'PAYMENT_MANAGER', 'UNDEFINED'],
     default: 'UNDEFINED',
     required: true
+  },
+  retailers: { 
+    type: [mongoose.Schema.Types.ObjectId], 
+    ref: 'Retailer' 
   }
 });
 
@@ -35,6 +39,7 @@ UserSchema.plugin(userAudit);
 
 // Instance methods
 export interface IUser extends IUserDocument {
+  retailers: string []
   generatePasswordHash: () => string;
   validatePassword(password: string): boolean;
 }
@@ -42,6 +47,7 @@ export interface IUser extends IUserDocument {
 // Static methods
 export interface IUserModel extends Model<IUser> {
   findByLogin(email: string): IUser;
+  findByRole(role: string): IUser [];
 }
 UserSchema.pre<IUser>('save', async function( next: () => void) {
   this.password = await this.generatePasswordHash();
@@ -52,6 +58,12 @@ UserSchema.static('findByLogin', async function(this: IUserModel, email: string)
   const user = await this.findOne({ email });
   return user;
 });
+
+UserSchema.static('findByRole', async function(this: IUserModel, role: string) {
+  const users = await this.find({ role });
+  return users;
+});
+
 
 UserSchema.method('generatePasswordHash', async function(this: IUser) {
   const saltRounds = 10;

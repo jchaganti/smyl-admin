@@ -2,7 +2,7 @@ import { AuthenticationError, UserInputError } from 'apollo-server';
 import { combineResolvers } from 'graphql-resolvers';
 import { IResolvers } from 'graphql-tools';
 import jwt, { Secret } from 'jsonwebtoken';
-import { Context, SignInInput, SignUpInput, USER_ROLE } from '../models/context';
+import { Context, SignInInput, SignUpInput, USER_ROLE, AssignCuratorInput } from '../models/context';
 import { IMessageModel } from '../models/message';
 import { IUserModel, IUser } from '../models/user';
 import { cast } from '../utils';
@@ -34,6 +34,17 @@ const resolverMap: IResolvers = {
       const UserModel: IUserModel = cast(models.User);
       return await UserModel.findById(_me.id);
     },
+    assignedRetailers: async (parent: any, args: any, { models, me }: Context) => {
+      const loggedInUser = getLoggedInUserWithRoleAs(me, [USER_ROLE.CURATOR, USER_ROLE.ADMIN]);
+      const UserModel: IUserModel = cast(models.User);
+      const user: IUser | null=  await UserModel.findById(loggedInUser.id).populate('retailers');
+      return user !== null?  {retailers: user.retailers}: {retailers: []};
+    },
+    curators: async (parent: any, args: any, { models, me }: Context) => {
+      const loggedInUser = getLoggedInUserWithRoleAs(me, [USER_ROLE.ADMIN]);
+      const UserModel: IUserModel = cast(models.User);
+      return await UserModel.findByRole(USER_ROLE.CURATOR);
+    },
   },
 
   Mutation: {
@@ -44,7 +55,7 @@ const resolverMap: IResolvers = {
     ) => {
       const UserModel: IUserModel = cast(models.User);
       const user: IUser = await UserModel.findByLogin(email);
-      const loggedInUser: IUser = getLoggedInUserWithRoleAs(me, USER_ROLE.ADMIN);
+      const loggedInUser: IUser = getLoggedInUserWithRoleAs(me, [USER_ROLE.ADMIN]);
       if (user) {
         throw new UserInputError(
           'User with this email id already exists!',
@@ -104,6 +115,53 @@ const resolverMap: IResolvers = {
         }
       },
     ),
+    assignRetailerToCurator: async (
+      parent: any,
+      { retailerId, curatorId }: AssignCuratorInput,
+      { models, me }: Context,
+    ) => {
+      const loggedInUser = getLoggedInUserWithRoleAs(me, [USER_ROLE.ADMIN]);
+      const UserModel: IUserModel = cast(models.User);
+      const user: IUser = cast(await UserModel.findById(curatorId));
+      const retailers = user.retailers? user.retailers: [];
+      if(retailers.includes(retailerId)) {
+        throw new UserInputError(`assignRetailerToCurator failed since retailer Id ${retailerId} is already associated with curator Id ${curatorId}`)
+      }
+      retailers.push(retailerId);
+      user.modifiedBy = loggedInUser;
+      console.log('@@@ Curator user', user)
+      try {
+        await UserModel.findByIdAndUpdate(curatorId, user);
+        return { status: true }
+      } catch (e) {
+        console.error('Error during assignCurator', e)
+        { status: false }
+      }
+    },
+    unassignRetailerToCurator: async (
+      parent: any,
+      { retailerId, curatorId }: AssignCuratorInput,
+      { models, me }: Context,
+    ) => {
+      const loggedInUser = getLoggedInUserWithRoleAs(me, [USER_ROLE.ADMIN]);
+      const UserModel: IUserModel = cast(models.User);
+      const user: IUser = cast(await UserModel.findById(curatorId));
+      const {retailers} = user;
+      const indx = retailers.findIndex(id=> id.toString() === retailerId);
+      console.log('@@@ Indx', indx)
+      if(indx === -1) {
+        throw new UserInputError(`unassignRetailerToCurator failed since retailer Id ${retailerId} is not associated with curator Id ${curatorId}`)
+      }
+      retailers.splice(indx,1);
+      user.modifiedBy = loggedInUser;
+      try {
+        await UserModel.findByIdAndUpdate(curatorId, user);
+        return { status: true }
+      } catch (e) {
+        console.error('Error during assignCurator', e)
+        { status: false }
+      }
+    }
   },
 
   User: {

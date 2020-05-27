@@ -4,7 +4,6 @@ import userSchema from './user';
 import messageSchema from './message';
 import retailerSchema from './retailer';
 import productSchema from './product';
-import curatorRetailSchema from './curatorRetailer';
 
 const linkSchema = gql`
   scalar Date
@@ -24,4 +23,4 @@ const linkSchema = gql`
   }
 `;
 
-export default [linkSchema, userSchema, messageSchema, retailerSchema, productSchema, curatorRetailSchema];
+export default [linkSchema, userSchema, messageSchema, retailerSchema, productSchema];

@@ -5,6 +5,8 @@ export default gql`
     users: [User!]
     user(id: ID!): User
     me: User
+    assignedRetailers: Retailers!
+    curators: [User!]
   }
 
   extend type Mutation {
@@ -12,6 +14,8 @@ export default gql`
     signIn(email: String!, password: String!): Token!
     updateUser(newPassword: String!): User!
     deleteUser(id: ID!): Boolean!
+    assignRetailerToCurator(curatorId: String!, retailerId: String!): Status!
+    unassignRetailerToCurator(curatorId: String!, retailerId: String!): Status!
   }
 
   type Token {
@@ -24,5 +28,9 @@ export default gql`
     role: String!
     verificationStatus:String!
     messages: [Message!]
+  }
+
+  type Retailers {
+    retailers: [Retailer!]!
   }
 `;
