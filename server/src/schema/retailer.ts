@@ -23,6 +23,7 @@ export default gql`
 
   type Status {
     status: Boolean!
+    error: String
   }
 `;
 

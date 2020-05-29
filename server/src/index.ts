@@ -45,7 +45,7 @@ const server = new ApolloServer({
     // leave only the important validation error
     const message = error.message
       .replace('SequelizeValidationError: ', '')
-      .replace('Validation error: ', '');
+      .replace('Validation error: ', '')
 
     return {
       ...error,

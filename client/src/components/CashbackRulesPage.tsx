@@ -61,7 +61,7 @@ const CashbackRulesPage: FunctionComponent = (props) => {
     setCashback(e.currentTarget.value);
   }
 
-  const handleSignIn = useCallback((e: any) => {
+  const handleSubmitCashback = useCallback((e: any) => {
     setSubmissionInProgress(true);
     console.log(retailer, category, cashback)
     e.preventDefault();
@@ -141,7 +141,7 @@ const CashbackRulesPage: FunctionComponent = (props) => {
             label='Submit'
             loading={submissionInProgress}
             disabled={submitDisabled}
-            onClick={handleSignIn}
+            onClick={handleSubmitCashback}
             className={'submit'}
           />
         </Grid>

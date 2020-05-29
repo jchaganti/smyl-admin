@@ -17,19 +17,22 @@ import ExitToAppSharpIcon from '@material-ui/icons/ExitToAppSharp';
 import MenuIcon from '@material-ui/icons/Menu';
 import clsx from 'clsx';
 import { createBrowserHistory } from 'history';
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useState } from 'react';
 import { Route, Router } from 'react-router-dom';
 import AddProductPage from './components/AddProductPage';
 import AddUserPage from './components/AddUserPage';
 import AssignCuratorPage from './components/AssignCuratorPage';
 import CashbackRulesPage from './components/CashbackRulesPage';
-import { mainListItems } from './components/ListItems';
+import { MainListItems } from './components/ListItems';
 import ProcessClaimsPage from './components/ProcessClaimsPage';
 import SearchClaimsPage from './components/SearchClaimsPage';
 import SignInPage from './components/SignInPage';
-import client, { getAccessToken } from './graphql/client';
+import client, { getAccessToken, saveInLocalStorage, removeFromLocalStorage } from './graphql/client';
 import { withRoot } from './withRoot';
-
+import jwtDecode from 'jwt-decode';
+import { ROLES } from './models';
+import { getRole } from './utils';
+import AddRetailerPage from './components/AddRetailer';
 
 
 const history = createBrowserHistory();
@@ -51,18 +54,29 @@ const Copyright: FunctionComponent = () => {
 
 const drawerWidth = 240;
 
-function Routes() {
-	const classes = useStyles();
+interface RoutesProps {
+	accessToken: string;
+}
 
+const DEFAULT_COMPONENT = {
+	[ROLES.ADMIN]: AddRetailerPage,
+	[ROLES.CURATOR]: AddProductPage,
+	[ROLES.PAYMENT_MANAGER]: ProcessClaimsPage,
+}
+
+function Routes({ accessToken }: RoutesProps) {
+	const classes = useStyles();
+	const role = getRole(accessToken);
 	return (
 		<div className={classes.content}>
-			<Route exact={true} path='/add-cashback-rules' component={CashbackRulesPage} />
-			<Route exact={true} path='/add-users' component={AddUserPage} />
-			<Route exact={true} path='/assign-curators' component={AssignCuratorPage} />
-			<Route exact={true} path='/add-product' component={AddProductPage} />
-			<Route exact={true} path='/manage-claims' component={ProcessClaimsPage} />
-			<Route exact={true} path='/search-claims' component={SearchClaimsPage} />
-			<Route exact={true} path='/' component={CashbackRulesPage} />
+			{role === ROLES.ADMIN && <Route exact={true} path='/add-retailer' component={AddRetailerPage} />}
+			{role === ROLES.ADMIN && <Route exact={true} path='/add-cashback-rules' component={CashbackRulesPage} />}
+			{role === ROLES.ADMIN && <Route exact={true} path='/add-users' component={AddUserPage} />}
+			{role === ROLES.ADMIN && <Route exact={true} path='/assign-curators' component={AssignCuratorPage} />}
+			{(role === ROLES.ADMIN || role === ROLES.CURATOR) && <Route exact={true} path='/add-product' component={AddProductPage} />}
+			{(role === ROLES.ADMIN || role === ROLES.PAYMENT_MANAGER) && <Route exact={true} path='/manage-claims' component={ProcessClaimsPage} />}
+			{(role === ROLES.ADMIN || role === ROLES.PAYMENT_MANAGER) && <Route exact={true} path='/search-claims' component={SearchClaimsPage} />}
+			<Route exact={true} path='/' component={DEFAULT_COMPONENT[role]} />
 		</div>
 	);
 }
@@ -73,7 +87,15 @@ type AppProps = {
 const App: FunctionComponent<AppProps> = (props: AppProps) => {
 	const classes = useStyles();
 	const [open, setOpen] = React.useState(true);
-	const accessToken = getAccessToken();
+	const [accessToken, setAccessToken] = useState<string>(getAccessToken());
+	const handleAccessToken = (accessToken: string) => {
+		saveInLocalStorage(accessToken);
+		setAccessToken(accessToken);
+	}
+	const signOut = () => {
+		removeFromLocalStorage();
+		setAccessToken('');
+	}
 
 	const handleDrawerOpen = () => {
 		setOpen(true);
@@ -82,7 +104,7 @@ const App: FunctionComponent<AppProps> = (props: AppProps) => {
 		setOpen(false);
 	};
 	const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
-
+	const role: string = getRole(accessToken);
 	return (
 		<ApolloProvider client={client}>
 			{accessToken ? (
@@ -102,9 +124,9 @@ const App: FunctionComponent<AppProps> = (props: AppProps) => {
 								</IconButton>
 								<Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
 									Smyl admin panel
-          </Typography>
+          			</Typography>
 								<IconButton color="inherit">
-									<ExitToAppSharpIcon />
+									<ExitToAppSharpIcon onClick={signOut} />
 								</IconButton>
 							</Toolbar>
 						</AppBar>
@@ -121,12 +143,12 @@ const App: FunctionComponent<AppProps> = (props: AppProps) => {
 								</IconButton>
 							</div>
 							<Divider />
-							<List>{mainListItems}</List>
+							<List><MainListItems role={role} /></List>
 						</Drawer>
 						<main className={classes.content}>
 							<div className={classes.appBarSpacer} />
 							<Container maxWidth="lg" className={classes.container}>
-								<Routes />
+								<Routes accessToken={accessToken} />
 								<Box pt={4}>
 									<Copyright />
 								</Box>
@@ -135,7 +157,7 @@ const App: FunctionComponent<AppProps> = (props: AppProps) => {
 
 					</div>
 				</Router>
-			) : <SignInPage />}
+			) : <SignInPage setAccessToken={handleAccessToken} />}
 
 		</ApolloProvider>
 	);

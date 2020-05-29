@@ -11,8 +11,11 @@ import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { FunctionComponent,  useCallback, useMemo, useState } from 'react';
 import ButtonWithLoader from './ButtonWithLoader';
+import { signInMutation } from '../graphql/mutations';
+import { useMutation } from '@apollo/react-hooks';
+import ErrorAlert from './Messages';
 
 function Copyright() {
   return (
@@ -47,11 +50,17 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function SignIn() {
+interface SignInProps {
+  setAccessToken: Function;
+}
+
+const SignIn: FunctionComponent<SignInProps> = ({setAccessToken}) => {
   const [email, setEmail] = useState<string>();
   const [password, setPassword] = useState<string>();
+  const [error, setError] = useState<string>();
   const [signInProgress, setSignInProgress] = useState<boolean>(false);
   const classes = useStyles();
+  const [signIn] = useMutation(signInMutation);
   //TODO: Fix any type below
   const handleChange = useCallback((e: any, handler: Function) => {
     handler(e.currentTarget.value.trim());
@@ -61,14 +70,19 @@ export default function SignIn() {
 
   const handlePasswordChange = useCallback((e: any) => handleChange(e, setPassword), []);
 
-  const handleSignIn = useCallback((e: any) => {
-    setSignInProgress(true);
-    console.log('email', email, 'password', password);
+  const handleSignIn = useCallback(async (e: any) =>  {
     e.preventDefault();
-    setTimeout(() => {
+    setSignInProgress(true);
+    try {
+      const {data:{signIn:{token}}} = await signIn({variables: {email, password}});
+      setAccessToken(token);
+      setError('')
+    } catch(e) {
+      setError(e.message.replace('GraphQL error: ', ''));
+    } finally {
       setSignInProgress(false);
-
-    }, 2000);
+    }
+    
   }, [email, password]);
 
   const submitDisabled = useMemo<boolean>(() => {
@@ -85,6 +99,7 @@ export default function SignIn() {
         <Typography component="h1" variant="h5">
           Sign in
         </Typography>
+        {error && <ErrorAlert severity="error">{error}</ErrorAlert>}
         <form className={classes.form} noValidate>
           <TextField
             variant="outlined"
@@ -143,3 +158,6 @@ export default function SignIn() {
     </Container>
   );
 }
+
+
+export default SignIn;

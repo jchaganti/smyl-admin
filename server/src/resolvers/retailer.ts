@@ -8,14 +8,14 @@ import { getLoggedInUserWithRoleAs } from './helper';
 
 
 
-const saveRetailer = async (retailer: IRetailerDocument, loggedInUser: IUser): Promise<boolean> => {
+const saveRetailer = async (retailer: IRetailerDocument, loggedInUser: IUser): Promise<object> => {
   retailer.modifiedBy = loggedInUser;
   try {
     await retailer.save();
-    return true;
+    return {status: true};
   } catch (e) {
     console.error('Error during saving of retailer', e);
-    return false;
+    return {status: false, error: e.errmsg};
   }
 }
 const resolverMap: IResolvers = {
@@ -38,9 +38,9 @@ const resolverMap: IResolvers = {
         userId: loggedInUser.id
       }));
       const retailer: IRetailerDocument = new RetailerModel({ name,  categories });
-      const status = await saveRetailer(retailer, loggedInUser);
-      return { status };
+      return await saveRetailer(retailer, loggedInUser);
     },
+    
     addCashback: async (
       parent: any,
       { retailerId, category, cashbackPercent }: AddCashbackInput,
@@ -54,13 +54,10 @@ const resolverMap: IResolvers = {
         const categoryObj: any = categories.find((_category: any) => category === _category.name);
         if(categoryObj) {
           categoryObj.cashbackPercent = cashbackPercent;
-          const status = await saveRetailer(retailer, loggedInUser);
-          return { status };
+          return await saveRetailer(retailer, loggedInUser);
         } else {
           throw new UserInputError(`Not able to find category with name ${category} for retailer with id ${retailerId}`);
         }
-        
-       
       } else {
         throw new UserInputError(`Not able to find retailer with id ${retailerId}`);
       }
