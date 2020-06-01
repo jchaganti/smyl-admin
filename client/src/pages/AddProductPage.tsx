@@ -12,7 +12,7 @@ import Tabs from '@material-ui/core/Tabs';
 import Typography from '@material-ui/core/Typography';
 import React, { FunctionComponent } from 'react';
 import { merchantToCategoryMapping, myRetailers } from '../utils/demo-data';
-import ButtonWithLoader from './ButtonWithLoader';
+import ButtonWithLoader from '../components/ButtonWithLoader';
 
 interface TabPanelProps {
   children?: React.ReactNode;

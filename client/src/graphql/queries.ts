@@ -2,15 +2,18 @@ import gql from 'graphql-tag';
 
 export const getCurators = gql`query {
   curators{
-   id
-   role
- }
- }`;
+    id
+    role
+  }
+}`;
 
-export const getAssignedRetailers = gql`query {
-  assignedRetailers{
-   categories{
-    }
+export const getUsers = gql`query {
+  users{
+    id
+    firstName
+    lastName
+    email
+    role
   }
 }`;
 
@@ -25,3 +28,11 @@ export const getAllRetailers = gql`query {
   }
 }`;
 
+
+export const getAssignedRetailers = gql`query {
+  assignedRetailers{
+      categories{
+        name
+    }
+  }
+}`;

@@ -21,7 +21,7 @@ import Search from '@material-ui/icons/Search';
 import ViewColumn from '@material-ui/icons/ViewColumn';
 import MaterialTable, { Icons } from 'material-table';
 import React, { forwardRef, FunctionComponent, useState } from 'react';
-import ButtonWithLoader from './ButtonWithLoader';
+import ButtonWithLoader from '../components/ButtonWithLoader';
 import { users, merchantToCategoryMapping, curatorToRetailer } from '../utils/demo-data';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';

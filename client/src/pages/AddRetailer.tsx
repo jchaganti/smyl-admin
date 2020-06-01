@@ -1,12 +1,12 @@
 import { Grid, TextField } from '@material-ui/core';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import React, { FunctionComponent, useState, useCallback, useMemo } from 'react';
-import ButtonWithLoader from './ButtonWithLoader';
-import PageHeader from './PageHeader';
+import ButtonWithLoader from '../components/ButtonWithLoader';
+import PageHeader from '../components/PageHeader';
 import { useMutation } from '@apollo/react-hooks';
 import { createRetailerMutation } from '../graphql/mutations';
-import { isEmpty } from 'lodash';
-import ErrorAlert, { SuccessSnackbar } from './Messages';
+import { isEmpty, uniqBy, lowerCase } from 'lodash';
+import ErrorAlert, { SuccessSnackbar } from '../components/Messages';
 
 
 const useStyles = makeStyles((theme: Theme) => (
@@ -25,15 +25,16 @@ const useStyles = makeStyles((theme: Theme) => (
 
 const AddRetailerPage: FunctionComponent = () => {
   const classes = useStyles();
-  const [error, setError] = useState<string>();
-  const [message, setMessage]  = useState<string>();
   const [name, setName] = useState<string>();
-  const [categories, setCategories] = useState<string []>(); //^([a-zA-Z1-9]*,{0,1}\s*)*
+  const [category, setCategory] = useState<string>();
+  const [categories, setCategories] = useState<string []>();
   const [invalidCategories, setInValidCategories] = useState<boolean>(false);
-  const [addRetailerInProgress, setAddRetailerInProgress] = useState<boolean>(false);
+  const [message, setMessage]  = useState<string>();
+  const [error, setError] = useState<string>();
+  const [actionInProgress, setActionInProgress] = useState<boolean>(false);
 
   const [addRetailer] = useMutation(createRetailerMutation);
-  //TODO: Fix any type below
+  
   const handleChange = useCallback((e: any, handler: Function) => {
     handler(e.currentTarget.value.trim());
   }, []);
@@ -45,21 +46,21 @@ const AddRetailerPage: FunctionComponent = () => {
   }, [name, categories]);
 
   const handleCategoriesChange = useCallback((e: any) => {
-    const _categories: string = e.currentTarget.value.trim();
-    if(_categories && _categories.match(/^\w+(,\w+)*$/g)) {
-      const categories = _categories.split(',');
-      setCategories(categories);
+    const category: string = e.currentTarget.value.trim();
+    setCategory(category);
+    if(category && category.match(/^\w+(,\w+)*$/g)) {
+      const categories = category.split(',');
+      setCategories(uniqBy(categories, lowerCase));
       setInValidCategories(false);
     } else {
       setInValidCategories(true);
       setCategories(undefined);
     }
-    e.currentTarget.value.trim().split(", ")
   }, []);
 
   const handleAddCategory = async (e: any) => {
     e.preventDefault();
-    setAddRetailerInProgress(true);
+    setActionInProgress(true);
     try {
       const {data: {createRetailer: {status, error}}} = await addRetailer({variables: {name, categories}});
       if(!status) {
@@ -69,11 +70,12 @@ const AddRetailerPage: FunctionComponent = () => {
         setCategories(undefined);
         setName('');
         setError('');
+        setCategory('');
       }
     } catch(e) {
       setError(e.message.replace('GraphQL error: ', ''));
     } finally {
-      setAddRetailerInProgress(false);
+      setActionInProgress(false);
     }
   }
   return (
@@ -98,7 +100,7 @@ const AddRetailerPage: FunctionComponent = () => {
         <Grid item xs={8}>
           <TextField
             error={invalidCategories}
-            helperText="The value of categories should be comma separated alphanumeric values"
+            helperText="Categories should be comma separated alphanumeric values"
             required
             fullWidth
             margin="normal"
@@ -106,7 +108,7 @@ const AddRetailerPage: FunctionComponent = () => {
             name="categories"
             label="Categories"
             variant="outlined"
-            value={(categories && categories.join(',')) || ''}
+            value={category}
             onChange={handleCategoriesChange}
           />
         </Grid>
@@ -125,7 +127,7 @@ const AddRetailerPage: FunctionComponent = () => {
         <Grid item xs={3}>
           <ButtonWithLoader
             label='Add'
-            loading={false}
+            loading={actionInProgress}
             disabled={submitDisabled}
             onClick={handleAddCategory}
             className={'submit'}

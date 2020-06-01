@@ -19,20 +19,20 @@ import clsx from 'clsx';
 import { createBrowserHistory } from 'history';
 import React, { FunctionComponent, useState } from 'react';
 import { Route, Router } from 'react-router-dom';
-import AddProductPage from './components/AddProductPage';
-import AddUserPage from './components/AddUserPage';
-import AssignCuratorPage from './components/AssignCuratorPage';
-import CashbackRulesPage from './components/CashbackRulesPage';
+import AddProductPage from './pages/AddProductPage';
+import AddUserPage from './pages/AddUserPage';
+import AssignCuratorPage from './pages/AssignCuratorPage';
+import CashbackRulesPage from './pages/CashbackRulesPage';
 import { MainListItems } from './components/ListItems';
-import ProcessClaimsPage from './components/ProcessClaimsPage';
-import SearchClaimsPage from './components/SearchClaimsPage';
-import SignInPage from './components/SignInPage';
+import ProcessClaimsPage from './pages/ProcessClaimsPage';
+import SearchClaimsPage from './pages/SearchClaimsPage';
+import SignInPage from './pages/SignInPage';
 import client, { getAccessToken, saveInLocalStorage, removeFromLocalStorage } from './graphql/client';
 import { withRoot } from './withRoot';
 import jwtDecode from 'jwt-decode';
 import { ROLES } from './models';
 import { getRole } from './utils';
-import AddRetailerPage from './components/AddRetailer';
+import AddRetailerPage from './pages/AddRetailer';
 
 
 const history = createBrowserHistory();

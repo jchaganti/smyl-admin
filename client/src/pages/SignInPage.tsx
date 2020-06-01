@@ -12,10 +12,10 @@ import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import React, { FunctionComponent,  useCallback, useMemo, useState } from 'react';
-import ButtonWithLoader from './ButtonWithLoader';
+import ButtonWithLoader from '../components/ButtonWithLoader';
 import { signInMutation } from '../graphql/mutations';
 import { useMutation } from '@apollo/react-hooks';
-import ErrorAlert from './Messages';
+import ErrorAlert from '../components/Messages';
 
 function Copyright() {
   return (

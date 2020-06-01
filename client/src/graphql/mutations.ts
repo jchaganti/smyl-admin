@@ -1,10 +1,13 @@
 import gql from 'graphql-tag';
 
 
-export const signUpMutation = gql`mutation ($email: String!, $password:String!, $role:String!){
-  signUp( email: $email, password:$password, role:$role){
+export const signUpMutation = gql`mutation ($firstName: String!, $lastName: String!, $email: String!, $role:String!){
+  signUp( firstName:$firstName, lastName:$lastName, email: $email, role:$role){
     id,
+    firstName,
+    lastName,
     email,
+    role,
     verificationStatus
   }
 }`;
@@ -43,3 +46,9 @@ export const unassignRetailerToCuratorMutation = gql`mutation ($curatorId: Strin
   }
 }`;
 
+export const deleteUserMutation = gql`mutation ($id: ID!) {
+  deleteUser(id: $id){
+    status,
+    error
+  }
+}`;

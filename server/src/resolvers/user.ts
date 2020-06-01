@@ -49,7 +49,7 @@ const resolverMap: IResolvers = {
   Mutation: {
     signUp: async (
       parent: any,
-      { email, password, role }: SignUpInput,
+      { firstName, lastName, email, role }: SignUpInput,
       { models, me }: Context,
     ) => {
       const UserModel: IUserModel = cast(models.User);
@@ -60,9 +60,17 @@ const resolverMap: IResolvers = {
           'User with this email id already exists!',
         );
       } else {
-        const user = new UserModel({ email, password, role });
+        const password = 'changeme123';
+        const user = new UserModel({ firstName, lastName, email, password, role });
         user.modifiedBy = loggedInUser;
-        return await user.save();
+        try {
+          const newUser = await user.save();
+          console.log('@@@ newUser' , newUser)
+          return newUser;
+        } catch(e) {
+          throw e;
+        }
+        
       }
     },
     signIn: async (
@@ -107,10 +115,14 @@ const resolverMap: IResolvers = {
         const user = await UserModel.findById(id);
 
         if (user) {
-          await user.remove();
-          return true;
+          try {
+            await user.remove();
+            return {status: true};
+          } catch(e) {
+            return {status: false, error: e};
+          }
         } else {
-          return false;
+          return {status: false, error: new Error('User not found with id ${id}')};
         }
       },
     ),
@@ -161,14 +173,6 @@ const resolverMap: IResolvers = {
     }
   },
 
-  User: {
-    messages: async (user: { id: any; }, args: any, { models }: Context) => {
-      const MessageModel: IMessageModel = cast(models.Message);
-      return await MessageModel.find({
-        userId: user.id,
-      });
-    },
-  },
 };
 
 export default resolverMap;

@@ -1,3 +1,4 @@
+import { useMutation, useQuery } from '@apollo/react-hooks';
 import { FormControl, Grid, InputLabel, MenuItem, Select, TextField } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
@@ -20,9 +21,15 @@ import SaveAlt from '@material-ui/icons/SaveAlt';
 import Search from '@material-ui/icons/Search';
 import ViewColumn from '@material-ui/icons/ViewColumn';
 import MaterialTable, { Icons } from 'material-table';
-import React, { forwardRef, FunctionComponent, useState } from 'react';
-import ButtonWithLoader from './ButtonWithLoader';
-import {users} from '../utils/demo-data';
+import React, { forwardRef, FunctionComponent, useCallback, useMemo, useState, useEffect } from 'react';
+import ButtonWithLoader from '../components/ButtonWithLoader';
+import ErrorAlert, { SuccessSnackbar } from '../components/Messages';
+import PageHeader from '../components/PageHeader';
+import client from '../graphql/client';
+import { signUpMutation, deleteUserMutation } from '../graphql/mutations';
+import { getUsers } from '../graphql/queries';
+import { User, Users, UsersData } from '../models';
+import { cast } from '../utils';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -98,36 +105,131 @@ const useStyles = makeStyles((theme: Theme) => (
   })
 ));
 
-const roleLabels: {[key: string] : string} = {
+const roleLabels: { [key: string]: string } = {
   'CURATOR': 'Curator',
   'PAYMENT_MANAGER': 'Payment manager'
 }
 const AddUserPage: FunctionComponent = () => {
   const classes = useStyles();
-  const [value, setValue] = React.useState(0);
 
-  const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
-    setValue(newValue);
+  const [currentTab, setCurrentTab] = useState<number>(0);
+  const [firstName, setFirstName] = useState<string>();
+  const [lastName, setLastName] = useState<string>();
+  const [email, setEmail] = useState<string>();
+  const [role, setRole] = useState<string>();
+
+  const [message, setMessage] = useState<string>();
+  const [error, setError] = useState<string>();
+  const [actionInProgress, setActionInProgress] = useState<boolean>(false);
+
+  const handleChange = useCallback((e: any, handler: Function) => {
+    handler(e.currentTarget.value.trim());
+  }, []);
+
+  const handleEmailChange = useCallback((e: any) => handleChange(e, setEmail), []);
+
+  const handleFirstNameChange = useCallback((e: any) => handleChange(e, setFirstName), []);
+
+  const handleLastNameChange = useCallback((e: any) => handleChange(e, setLastName), []);
+
+  const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
+    setCurrentTab(newValue);
   };
+
+  const handleRoleChange = useCallback((e: any) => {
+    const value = e.currentTarget.value;
+    setRole(Object.keys(roleLabels)[value]);
+  }, []);
+
+  const submitDisabled = useMemo<boolean>(() => {
+    return !firstName || !lastName || !email || !role;
+  }, [firstName, lastName, email, role]);
+
+  const { data }: UsersData = cast(useQuery(getUsers));
+  const { users }: Users = data || [];
 
   const [state, setState] = useState({
     columns: [
       { title: 'First name', field: 'firstName' },
       { title: 'Last name', field: 'lastName' },
-      { title: 'Email', field: 'email'},
-      { title: 'Role', field: 'role', render: (rowData: any) =>  roleLabels[rowData.role] },
+      { title: 'Email', field: 'email' },
+      { title: 'Role', field: 'role', render: (rowData: any) => roleLabels[rowData.role] },
     ],
     data: users,
   });
 
+
+  useEffect(() => {
+    setState({
+      ...state,
+      data: users && users.filter(user => user.role !== 'ADMIN') || []
+    })
+  }, [users]);
+
+  const [addUser] = useMutation(signUpMutation, {
+    onCompleted: (data: any) => {
+      const { signUp: { id, firstName, lastName, email, role } } = data;
+      if (id && firstName && lastName && email && role) {
+        const user: User = { id, firstName, lastName, email, role }
+        client.writeData({
+          data: { users }
+        });
+        setState({
+          ...state,
+          data: users && [...users, user].filter(user => user.role !== 'ADMIN') || []
+        })
+      }
+    }
+  });
+
+  const [deleteUser] = useMutation(deleteUserMutation, {
+    onCompleted: (data: any) => {
+      const { deleteUser: { status, error } } = data;
+      if (!status && error) {
+        setError(error);
+      } else {
+
+      }
+    }
+  });
+
+  const handleAddUser = useCallback(async (e: any) => {
+    setActionInProgress(true);
+    e.preventDefault();
+    try {
+      const { data: { signUp: { id } }, errors } = await addUser({ variables: { firstName, lastName, email, role } });
+      if (!id || errors) {
+        if (errors) {
+          setError(errors[0].message);
+        }
+      } else {
+        setMessage(`The user with ${firstName} ${lastName} with role ${role} has been added`);
+        setFirstName('');
+        setLastName('');
+        setEmail('');
+        setRole('');
+
+      }
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setActionInProgress(false)
+    }
+
+
+  }, [firstName, lastName, email, role]);
+
   return (
     <div className={classes.root}>
-      <Tabs value={value} onChange={handleChange} indicatorColor="primary"
+      <PageHeader title={'Add user'} subTitle={'Add user details - first name, last name, email and their role'}></PageHeader>
+      {error && <ErrorAlert style={{ marginTop: '1rem', marginBottom: '1.5rem' }} severity="error">{error}</ErrorAlert>}
+      {message && <SuccessSnackbar message={message} onClose={() => setMessage('')}></SuccessSnackbar>}
+      <Tabs value={currentTab} onChange={handleTabChange} indicatorColor="primary"
         textColor="primary" aria-label="add user">
         <Tab label="Add user" {...a11yProps(0)} />
         <Tab label="Manage users" {...a11yProps(1)} />
       </Tabs>
-      <TabPanel value={value} index={0}>
+      <TabPanel value={currentTab} index={0}>
         <Grid container spacing={3}>
 
           <Grid item xs={6}>
@@ -139,7 +241,8 @@ const AddUserPage: FunctionComponent = () => {
               name="firstName"
               label="First name"
               id="firstName"
-              onChange={() => { }}
+              value={firstName}
+              onChange={handleFirstNameChange}
               autoComplete="current-firstName"
             />
           </Grid>
@@ -152,7 +255,8 @@ const AddUserPage: FunctionComponent = () => {
               name="lastName"
               label="Last name"
               id="lastName"
-              onChange={() => { }}
+              value={lastName}
+              onChange={handleLastNameChange}
               autoComplete="current-lastName"
             />
           </Grid>
@@ -166,20 +270,21 @@ const AddUserPage: FunctionComponent = () => {
               name="email"
               label="Email"
               id="email"
-              onChange={() => { }}
+              value={email}
+              onChange={handleEmailChange}
               autoComplete="current-email"
             />
           </Grid>
           <Grid item xs={6}>
             <FormControl className={classes.formControl}>
-              <InputLabel id="demo-simple-select-filled-label">Role</InputLabel>
+              <InputLabel id="user-role-select-filled-label">Role</InputLabel>
               <Select
                 labelId="user-role-select-label"
                 id="user-role-select"
                 required
                 displayEmpty
                 fullWidth
-                onChange={() => { }}
+                onChange={handleRoleChange}
               >
                 <MenuItem value={'CURATOR'}>Curator</MenuItem>
                 <MenuItem value={'PAYMENT_MANAGER'}>Payment manager</MenuItem>
@@ -204,9 +309,9 @@ const AddUserPage: FunctionComponent = () => {
           <Grid item xs={3}>
             <ButtonWithLoader
               label='Submit'
-              loading={false}
-              disabled={false}
-              onClick={() => { }}
+              loading={actionInProgress}
+              disabled={submitDisabled}
+              onClick={handleAddUser}
               className={'submit'}
             />
           </Grid>
@@ -214,24 +319,28 @@ const AddUserPage: FunctionComponent = () => {
 
         </Grid>
       </TabPanel>
-      <TabPanel value={value} index={1}>
+      <TabPanel value={currentTab} index={1}>
         <MaterialTable
           icons={tableIcons}
           title="Manage users"
           columns={state.columns}
           data={state.data}
           editable={{
-            onRowDelete: (oldData) =>
-              new Promise((resolve) => {
-                setTimeout(() => {
-                  resolve();
-                  setState((prevState) => {
-                    const data = [...prevState.data];
-                    data.splice(data.indexOf(oldData), 1);
-                    return { ...prevState, data };
-                  });
-                }, 600);
-              }),
+            onRowDelete: async (user: User) => {
+              const { id } = user;
+              const { data: { deleteUser: { status, error } } } = await deleteUser({ variables: { id } });
+              console.log('@@@ Status', status, 'Error', error);
+              if (status) {
+                setMessage('User has been successfully delete');
+                setState((prevState) => {
+                  const data = [...prevState.data];
+                  data.splice(data.indexOf(user), 1);
+                  return { ...prevState, data };
+                });
+              } else {
+                setError(error);
+              }
+            }
           }}
         />
       </TabPanel>

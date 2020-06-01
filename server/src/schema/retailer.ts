@@ -20,10 +20,5 @@ export default gql`
     name: String!
     cashbackPercent: Float
   }
-
-  type Status {
-    status: Boolean!
-    error: String
-  }
 `;
 
