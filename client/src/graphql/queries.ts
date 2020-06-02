@@ -3,7 +3,12 @@ import gql from 'graphql-tag';
 export const getCurators = gql`query {
   curators{
     id
-    role
+    firstName
+    lastName
+    retailers {
+      id,
+      name
+    }
   }
 }`;
 

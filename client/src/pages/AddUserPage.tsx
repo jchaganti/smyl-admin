@@ -137,8 +137,7 @@ const AddUserPage: FunctionComponent = () => {
   };
 
   const handleRoleChange = useCallback((e: any) => {
-    const value = e.currentTarget.value;
-    setRole(Object.keys(roleLabels)[value]);
+    setRole(e.target.value);
   }, []);
 
   const submitDisabled = useMemo<boolean>(() => {
@@ -182,16 +181,7 @@ const AddUserPage: FunctionComponent = () => {
     }
   });
 
-  const [deleteUser] = useMutation(deleteUserMutation, {
-    onCompleted: (data: any) => {
-      const { deleteUser: { status, error } } = data;
-      if (!status && error) {
-        setError(error);
-      } else {
-
-      }
-    }
-  });
+  const [deleteUser] = useMutation(deleteUserMutation);
 
   const handleAddUser = useCallback(async (e: any) => {
     setActionInProgress(true);
@@ -329,9 +319,8 @@ const AddUserPage: FunctionComponent = () => {
             onRowDelete: async (user: User) => {
               const { id } = user;
               const { data: { deleteUser: { status, error } } } = await deleteUser({ variables: { id } });
-              console.log('@@@ Status', status, 'Error', error);
               if (status) {
-                setMessage('User has been successfully delete');
+                setMessage('User has been successfully deleted');
                 setState((prevState) => {
                   const data = [...prevState.data];
                   data.splice(data.indexOf(user), 1);

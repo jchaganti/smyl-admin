@@ -38,7 +38,7 @@ export const MainListItems: FunctionComponent<MainListItemsProps> = ({ role }: M
       <ListItemIcon>
         <AssignmentIndIcon />
       </ListItemIcon>
-      <ListItemText primary="Assign curator" />
+      <ListItemText primary="Manage retailers" />
     </ListItem>}
     {(role === ROLES.ADMIN || role === ROLES.CURATOR) && <ListItem button component={NavLinkMui} to="/add-product">
       <ListItemIcon>

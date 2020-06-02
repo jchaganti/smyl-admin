@@ -29,6 +29,7 @@ export default gql`
     email: String!
     role: String!
     verificationStatus:String!
+    retailers: [Retailer!]
   }
 
   type Status {

@@ -33,10 +33,19 @@ export interface User {
   lastName: string;
   email: string;
   role: string;
+  retailers?: Retailer [];
 }
 export interface Users {
   users: User [];
 }
 export interface UsersData {
   data : Users
+}
+
+
+export interface Curators {
+  curators: User [];
+}
+export interface CuratorsData {
+  data : Curators
 }

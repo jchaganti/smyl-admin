@@ -8,6 +8,7 @@ import { IUserModel, IUser } from '../models/user';
 import { cast } from '../utils';
 import { isAdmin, isAuthenticated } from './authorization';
 import { getLoggedInUserWithRoleAs } from './helper';
+import { IRetailerDocument } from '../models/retailer';
 const createToken = async (user: IUser, secret: Secret, expiresIn: string) => {
   const { id, email, role } = user;
   return await jwt.sign({ id, email, role }, secret, {
@@ -64,9 +65,7 @@ const resolverMap: IResolvers = {
         const user = new UserModel({ firstName, lastName, email, password, role });
         user.modifiedBy = loggedInUser;
         try {
-          const newUser = await user.save();
-          console.log('@@@ newUser' , newUser)
-          return newUser;
+          return await user.save();
         } catch(e) {
           throw e;
         }
@@ -156,8 +155,9 @@ const resolverMap: IResolvers = {
       const loggedInUser = getLoggedInUserWithRoleAs(me, [USER_ROLE.ADMIN]);
       const UserModel: IUserModel = cast(models.User);
       const user: IUser = cast(await UserModel.findById(curatorId));
-      const {retailers} = user;
-      const indx = retailers.findIndex(id=> id.toString() === retailerId);
+      const {retailers:_retailers} = user;
+      const retailers: IRetailerDocument [] =  cast(_retailers);
+      const indx = retailers.findIndex(retailer=> retailer.id === retailerId);
       if(indx === -1) {
         throw new UserInputError(`unassignRetailerToCurator failed since retailer Id ${retailerId} is not associated with curator Id ${curatorId}`)
       }
