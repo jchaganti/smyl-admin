@@ -49,7 +49,7 @@
     "@types/graphql-type-json": "^0.3.2",
     "@types/mongoose-autopopulate": "^0.10.1",
     "apollo-server": "^2.13.0",
-    "apollo-server-express": "^2.13.0",
+    "apollo-server-express": "^2.14.2",
     "bcrypt": "^3.0.8",
     "cors": "^2.8.5",
     "dataloader": "^1.4.0",
